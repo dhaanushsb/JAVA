@@ -1,0 +1,103 @@
+### Overview of the Project
+
+This **BankingApp** project is a console-based Java application that allows users to interact with a bank database. It demonstrates basic banking operations such as checking account balance, depositing funds, and withdrawing funds. The application uses Java's `JDBC` API to interact with an Oracle database, where account details are stored in a table named `accounts`.
+
+### Key Concepts Used
+
+1. **JDBC (Java Database Connectivity)**: This API allows Java to interact with relational databases. Here, JDBC is used to connect to an Oracle database, execute SQL queries, and retrieve results.
+2. **SQL**: SQL commands are used to retrieve and modify data in the database, ensuring the bank balance is always current.
+3. **Transactions**: Transactions are used in the `withdraw` function to ensure atomicity. This means that a withdrawal operation is either fully completed or fully rolled back if there is an error.
+4. **Input Validation**: Ensures user inputs (e.g., deposit and withdrawal amounts) are valid.
+
+### Flow of the Program
+
+1. **Database Connection**:
+    - The `main` method starts by connecting to the Oracle database using the `DriverManager.getConnection()` method.
+    - The connection details (URL, username, and password) are defined as constants for easy maintenance.
+    - If the connection is successful, the program prints a confirmation message.
+
+2. **User Menu**:
+    - A loop is created to display the menu to the user continuously until they choose to exit.
+    - The menu options allow the user to:
+        - Check the balance.
+        - Deposit money.
+        - Withdraw money.
+        - Exit the application.
+
+3. **Switching Based on User Choice**:
+    - Depending on the user's input (`choice`), the application calls the appropriate method (`checkBalance`, `deposit`, or `withdraw`) with necessary inputs (like account number and amount).
+    - If the user inputs an invalid choice, an error message is displayed.
+
+4. **Core Functionalities**:
+
+    - **Check Balance** (`checkBalance` method):
+        - The method retrieves the account balance using a `SELECT` query.
+        - It checks if the account exists by querying the `accounts` table with the specified account number.
+        - If the account exists, it prints the balance; otherwise, it notifies the user that the account is not found.
+
+    - **Deposit Money** (`deposit` method):
+        - This method adds a specified amount to the account balance.
+        - First, it checks if the amount entered is positive. If not, it shows an error message.
+        - It updates the balance using an `UPDATE` statement that adds the deposit amount to the current balance.
+        - It then verifies if the account exists and if the deposit was successful.
+
+    - **Withdraw Money** (`withdraw` method):
+        - This is the most complex function because it includes transaction management.
+        - First, the method checks if the amount is positive. If not, it shows an error message.
+        - It retrieves the current balance to check if there are sufficient funds for the withdrawal.
+        - If sufficient funds exist, it subtracts the amount from the balance. If not, it notifies the user of insufficient funds.
+        - The `withdraw` method uses a transaction with `connection.setAutoCommit(false)` to ensure either:
+            - The withdrawal completes fully (balance updated and `commit`).
+            - Or, in case of error or insufficient funds, no change is made (`rollback`).
+
+5. **Error Handling and Resource Management**:
+    - Error handling is included to catch `SQLException` and display relevant error messages.
+    - Using `try-with-resources` ensures that all database resources like `PreparedStatement` and `ResultSet` are automatically closed after use.
+    - `finally` block closes the `Scanner` object to free up resources.
+
+### What Each Method Does and Why
+
+- **`checkBalance(Connection connection, int accountNumber)`**:
+    - Queries the database for the balance of the specified account.
+    - Only reads from the database, making it a simple `SELECT` operation.
+  
+- **`deposit(Connection connection, int accountNumber, double amount)`**:
+    - Increases the balance by a given amount if the account exists and the amount is positive.
+    - Uses an `UPDATE` SQL command to adjust the balance.
+    - Confirms a successful deposit or informs if the account is not found.
+  
+- **`withdraw(Connection connection, int accountNumber, double amount)`**:
+    - Checks if the account has sufficient funds for the withdrawal.
+    - Uses a `SELECT` to check the balance, and an `UPDATE` to adjust the balance if funds are sufficient.
+    - The `withdraw` method uses a transaction (beginning with `setAutoCommit(false)`) to ensure the operation completes entirely or rolls back on any issue.
+
+### How to Run the Program
+
+1. **Set Up the Database**:
+    - Ensure the Oracle database is running and accessible.
+    - Use the `accounts` table script to create the table in SQL*Plus.
+    - Insert sample records to test each function (balance, deposit, withdraw).
+
+2. **Run the Program**:
+    - Compile the `BankingApp.java` file.
+    - Execute it in the terminal.
+    - Choose menu options and follow the prompts to interact with the program.
+
+3. **Expected Outputs**:
+    - Selecting each option in the menu will interact with the database and show results.
+    - Each operation will print success messages or errors, depending on the inputs.
+
+### Confidence Boost: Key Points to Remember
+
+1. **Database Connection**: You are establishing a real-time connection to the database using JDBC, allowing your Java program to read and update the data.
+2. **Using SQL with Java**: SQL commands (`SELECT`, `UPDATE`) are embedded within Java, which you can confidently use to manipulate database records.
+3. **Transactions**: By handling `commit` and `rollback`, you ensure that the account balance is always correct even if an error occurs during the withdrawal.
+4. **Error Handling and Validation**: Your program manages errors gracefully and checks for invalid inputs (negative amounts, nonexistent accounts).
+5. **Reusability**: Each method (`checkBalance`, `deposit`, `withdraw`) is self-contained, making it easy to update individual functions without affecting the entire program.
+
+### After Following the Explanation
+
+With this structure,
+- Add new features (e.g., transfer between accounts).
+- Enhance the UI or database schema.
+- Confidently handle SQL and Java interaction, knowing where to apply each SQL command and method in Java.
